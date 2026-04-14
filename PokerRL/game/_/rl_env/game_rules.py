@@ -80,6 +80,55 @@ class LeducRules:
 
         return LutHolderLeduc(cls)
 
+class KuhnRules:
+    N_HOLE_CARDS = 1
+    N_RANKS = 3
+    N_SUITS = 1
+    N_CARDS_IN_DECK = N_RANKS * N_SUITS
+    RANGE_SIZE = PokerRange.get_range_size(n_hole_cards=N_HOLE_CARDS, n_cards_in_deck=N_CARDS_IN_DECK)
+
+    BTN_IS_FIRST_POSTFLOP = True
+
+    N_FLOP_CARDS = 0
+    N_TURN_CARDS = 0
+    N_RIVER_CARDS = 0
+    N_TOTAL_BOARD_CARDS = 0
+    ALL_ROUNDS_LIST = [Poker.PREFLOP]
+
+    SUITS_MATTER = False
+
+    ROUND_BEFORE = {
+        Poker.PREFLOP: Poker.PREFLOP
+    }
+    ROUND_AFTER = {
+        Poker.PREFLOP: None
+    }
+
+    RANK_DICT = {i: str(i + 1) for i in range(N_RANKS)}
+    SUIT_DICT = {0: ""}
+
+    STRING = "KUHN_RULES"
+
+    def __init__(self):
+        pass
+
+    def get_hand_rank_all_hands_on_given_boards(self, boards_1d, lut_holder):
+        hand_ranks = np.full(shape=(boards_1d.shape[0], KuhnRules.RANGE_SIZE), fill_value=-1, dtype=np.int32)
+        for board_idx in range(boards_1d.shape[0]):
+            for range_idx in range(KuhnRules.RANGE_SIZE):
+                hand_ranks[board_idx, range_idx] = self.get_hand_rank(
+                    hand_2d=lut_holder.get_2d_hole_cards_from_range_idx(range_idx=range_idx),
+                    board_2d=np.array([]))
+        return hand_ranks
+
+    def get_hand_rank(self, hand_2d, board_2d):
+        return hand_2d[0, 0]
+
+    @classmethod
+    def get_lut_holder(cls):
+        from PokerRL.game._.look_up_table import LutHolderLeduc
+        return LutHolderLeduc(cls)
+
 
 class BigLeducRules:
     N_HOLE_CARDS = 1

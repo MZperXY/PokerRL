@@ -6,11 +6,42 @@ A collection of Poker games often used in computational poker research.
 """
 
 from PokerRL.game.Poker import Poker
-from PokerRL.game._.rl_env.game_rules import HoldemRules, LeducRules, FlopHoldemRules, BigLeducRules
+from PokerRL.game._.rl_env.game_rules import HoldemRules, LeducRules, FlopHoldemRules, BigLeducRules, KuhnRules
 from PokerRL.game._.rl_env.poker_types.DiscretizedPokerEnv import DiscretizedPokerEnv
 from PokerRL.game._.rl_env.poker_types.LimitPokerEnv import LimitPokerEnv
 from PokerRL.game._.rl_env.poker_types.NoLimitPokerEnv import NoLimitPokerEnv
 
+
+class Kuhn(KuhnRules, LimitPokerEnv):
+    """
+    Kuhn Poker
+    """
+
+    RULES = KuhnRules
+    IS_FIXED_LIMIT_GAME = True
+    IS_POT_LIMIT_GAME = False
+    MAX_N_RAISES_PER_ROUND = {
+        Poker.PREFLOP: 1,
+    }
+
+    SMALL_BLIND = 0
+    BIG_BLIND = 0
+    ANTE = 1
+    SMALL_BET = 1
+    BIG_BET = 1
+    DEFAULT_STACK_SIZE = 2
+
+    EV_NORMALIZER = 1000.0 / ANTE  # Milli Antes
+    WIN_METRIC = Poker.MeasureAnte
+
+    ROUND_WHERE_BIG_BET_STARTS = Poker.FLOP # won't be reached
+
+    def __init__(self, env_args, lut_holder, is_evaluating):
+        KuhnRules.__init__(self)
+        LimitPokerEnv.__init__(self,
+                               env_args=env_args,
+                               lut_holder=lut_holder,
+                               is_evaluating=is_evaluating)
 
 # """""""""""""""
 # Leduc Family
@@ -259,6 +290,7 @@ register all new envs here!
 """
 ALL_ENVS = [
     StandardLeduc,
+    Kuhn,
     BigLeduc,
     NoLimitLeduc,
     DiscretizedNLLeduc,
